@@ -9,6 +9,10 @@ class _RegisterState extends State<Register> {
 // Explicit
 
   final formKey = GlobalKey<FormState>();
+  String nameString, emailString, passwordString;
+
+
+
 // Method
 
   Widget nameText() {
@@ -36,6 +40,8 @@ class _RegisterState extends State<Register> {
           if (value.isEmpty) {
             return 'Please enter your name'
           }
+        }, onSaved: (String value){
+          nameString = value;
         },
       ),
     );
@@ -67,6 +73,8 @@ class _RegisterState extends State<Register> {
           if (!((value.contains('@')) && (value.contains('.')))) {
             return 'Please Type your@email.com';
           }
+        }, onSaved: (String value){
+            emailString = value;
         },
       ),
     );
@@ -97,6 +105,8 @@ class _RegisterState extends State<Register> {
             if (value.length <6){
               return 'Please enter password more 6 characters';
             }
+        }, onSaved: (String value){
+          passwordString = value;
         },
       ),
     );
@@ -109,7 +119,8 @@ class _RegisterState extends State<Register> {
         print('Click Upload');
 
         if (formKey.currentState.validate()) {
-
+          formKey.currentState.save();
+          print('name = $nameString, email = $emailString, password = $passwordString');
         }
 
       },
