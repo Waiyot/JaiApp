@@ -8,6 +8,7 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
 // Explicit
 
+  final formKey = GlobalKey<FormState>();
 // Method
 
   Widget nameText() {
@@ -31,7 +32,11 @@ class _RegisterState extends State<Register> {
             size: 36.0,
             color: Colors.blue,
           ),
-        ),
+        ), validator: (String value){
+          if (value.isEmpty) {
+            return 'Please enter your name'
+          }
+        },
       ),
     );
   }
@@ -40,6 +45,7 @@ class _RegisterState extends State<Register> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
       child: TextFormField(
+        keyboardType: TextInputType.emailAddress,
         style: TextStyle(
           color: Colors.orange,
         ),
@@ -57,7 +63,11 @@ class _RegisterState extends State<Register> {
             size: 36.0,
             color: Colors.orange,
           ),
-        ),
+        ), validator: (String value) {
+          if (!((value.contains('@')) && (value.contains('.')))) {
+            return 'Please Type your@email.com';
+          }
+        },
       ),
     );
   }
@@ -83,7 +93,11 @@ class _RegisterState extends State<Register> {
             size: 36.0,
             color: Colors.purple,
           ),
-        ),
+        ), validator: (String value){
+            if (value.length <6){
+              return 'Please enter password more 6 characters';
+            }
+        },
       ),
     );
   }
@@ -91,13 +105,21 @@ class _RegisterState extends State<Register> {
   Widget uploadButton() {
     return IconButton(
       icon: Icon(Icons.cloud_upload),
-      onPressed: () {},
+      onPressed: () {
+        print('Click Upload');
+
+        if (formKey.currentState.validate()) {
+
+        }
+
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         backgroundColor: Colors.green[700],
         title: Text('Register'),
@@ -108,12 +130,14 @@ class _RegisterState extends State<Register> {
       body: Container(
         alignment: Alignment.topCenter,
         padding: EdgeInsets.only(top: 60.0),
-        child: Column(
-          children: <Widget>[
-            nameText(),
-            emailText(),
-            passwordText(),
-          ],
+        child: Form(key: formKey,
+          child: Column(
+            children: <Widget>[
+              nameText(),
+              emailText(),
+              passwordText(),
+            ],
+          ),
         ),
       ),
     );
