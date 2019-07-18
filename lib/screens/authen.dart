@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:jai_app/screens/my_service.dart';
 import 'package:jai_app/screens/register.dart';
 
 class Authen extends StatefulWidget {
@@ -11,8 +13,29 @@ class _AuthenState extends State<Authen> {
   double mylenght = 160.0;
   double h1 = 36.0;
   double h2 = 18.0;
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   // Method
+
+  @override
+  void initState() {
+    super.initState();
+    checkStatus();
+  }
+
+  Future<void> checkStatus() async {
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    if (firebaseUser != null) {
+      moveToService();
+    }
+  }
+
+  void moveToService() {
+    var serviceRoute =
+        MaterialPageRoute(builder: (BuildContext context) => MyService());
+    Navigator.of(context)
+        .pushAndRemoveUntil(serviceRoute, (Route<dynamic> route) => false);
+  }
 
   Widget signInButton() {
     return Expanded(
@@ -37,7 +60,7 @@ class _AuthenState extends State<Authen> {
           //Creat Route
           var registerRoute =
               MaterialPageRoute(builder: (BuildContext context) => Register());
-              Navigator.of(context).push(registerRoute);
+          Navigator.of(context).push(registerRoute);
         },
       ),
     );

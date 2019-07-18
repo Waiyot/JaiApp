@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:jai_app/screens/my_service.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -10,8 +12,7 @@ class _RegisterState extends State<Register> {
 
   final formKey = GlobalKey<FormState>();
   String nameString, emailString, passwordString;
-
-
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
 // Method
 
@@ -36,11 +37,13 @@ class _RegisterState extends State<Register> {
             size: 36.0,
             color: Colors.blue,
           ),
-        ), validator: (String value){
+        ),
+        validator: (String value) {
           if (value.isEmpty) {
             return 'Please enter your name';
           }
-        }, onSaved: (String value){
+        },
+        onSaved: (String value) {
           nameString = value;
         },
       ),
@@ -69,12 +72,14 @@ class _RegisterState extends State<Register> {
             size: 36.0,
             color: Colors.orange,
           ),
-        ), validator: (String value) {
+        ),
+        validator: (String value) {
           if (!((value.contains('@')) && (value.contains('.')))) {
             return 'Please Type your@email.com';
           }
-        }, onSaved: (String value){
-            emailString = value;
+        },
+        onSaved: (String value) {
+          emailString = value;
         },
       ),
     );
@@ -101,11 +106,13 @@ class _RegisterState extends State<Register> {
             size: 36.0,
             color: Colors.purple,
           ),
-        ), validator: (String value){
-            if (value.length <6){
-              return 'Please enter password more 6 characters';
-            }
-        }, onSaved: (String value){
+        ),
+        validator: (String value) {
+          if (value.length < 6) {
+            return 'Please enter password more 6 characters';
+          }
+        },
+        onSaved: (String value) {
           passwordString = value;
         },
       ),
@@ -120,9 +127,79 @@ class _RegisterState extends State<Register> {
 
         if (formKey.currentState.validate()) {
           formKey.currentState.save();
-          print('name = $nameString, email = $emailString, password = $passwordString');
-        }
+          print(
+              'name = $nameString, email = $emailString, password = $passwordString');
 
+          uploadToFirebase();
+        }
+      },
+    );
+  }
+
+  Future<void> uploadToFirebase() async {
+    await firebaseAuth
+        .createUserWithEmailAndPassword(
+            email: emailString, password: passwordString)
+        .then((objResponse) {
+      print('Register Success');
+      setUpDisplayName();
+    }).catchError((objResponse) {
+      String errorString = objResponse.message;
+      print('Error = $errorString');
+      myAlertDialog(errorString);
+    });
+  }
+
+  Future<void> setUpDisplayName() async {
+    await firebaseAuth.currentUser().then((response) {
+      UserUpdateInfo updateInfo = UserUpdateInfo();
+      updateInfo.displayName = nameString;
+      response.updateProfile(updateInfo);
+      moveToService();
+    });
+  }
+
+  void moveToService() {
+    var myServiceRoute =
+        MaterialPageRoute(builder: (BuildContext context) => MyService());
+    Navigator.of(context)
+        .pushAndRemoveUntil(myServiceRoute, (Route<dynamic> route) => false);
+  }
+
+  Widget alertButton() {
+    return FlatButton(
+      child: Text('OK'),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
+  Widget alertMessage(String messageString) {
+    return Container(
+      alignment: Alignment.topCenter,
+      child: Column(
+        children: <Widget>[
+          Container(
+            width: 120,
+            height: 120,
+            child: Image.asset('images/logo_movie.png'),
+          ),
+          Text(messageString),
+        ],
+      ),
+    );
+  }
+
+  void myAlertDialog(String messageString) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Register Error'),
+          content: alertMessage(messageString),
+          actions: <Widget>[alertButton()],
+        );
       },
     );
   }
@@ -141,7 +218,8 @@ class _RegisterState extends State<Register> {
       body: Container(
         alignment: Alignment.topCenter,
         padding: EdgeInsets.only(top: 60.0),
-        child: Form(key: formKey,
+        child: Form(
+          key: formKey,
           child: Column(
             children: <Widget>[
               nameText(),
