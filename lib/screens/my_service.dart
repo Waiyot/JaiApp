@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:jai_app/screens/home.dart';
+import 'package:jai_app/screens/info.dart';
 
 class MyService extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class _MyServiceState extends State<MyService> {
 
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   String nameDisplay = ' ';
+  Widget myWidget = Home();
 
 // Method
   @override
@@ -66,6 +69,32 @@ class _MyServiceState extends State<MyService> {
     );
   }
 
+  Widget homePage() {
+    return ListTile(
+      leading: Icon(Icons.home),
+      title: Text('Home'),
+      onTap: () {
+        setState(() {
+          myWidget = Home();
+          Navigator.of(context).pop();
+        });
+      },
+    );
+  }
+
+  Widget infoPage() {
+    return ListTile(
+      leading: Icon(Icons.info),
+      title: Text('Information'),
+      onTap: () {
+        setState(() {
+          myWidget = Info();
+          Navigator.of(context).pop();
+        });
+      },
+    );
+  }
+
   Future<void> signOutProcess() async {
     await firebaseAuth.signOut().then((response) {
       myCloseApp();
@@ -81,6 +110,8 @@ class _MyServiceState extends State<MyService> {
       child: ListView(
         children: <Widget>[
           showHeadDrawer(),
+          homePage(),
+          infoPage(),
           signOutButton(),
         ],
       ),
@@ -94,7 +125,7 @@ class _MyServiceState extends State<MyService> {
         backgroundColor: Colors.green[700],
         title: Text('My Service'),
       ),
-      body: Text('body'),
+      body: myWidget,
       drawer: menuDrawer(),
     );
   }
