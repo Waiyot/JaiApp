@@ -38,7 +38,7 @@ class _RegisterState extends State<Register> {
           ),
         ), validator: (String value){
           if (value.isEmpty) {
-            return 'Please enter your name'
+            return 'Please enter your name';
           }
         }, onSaved: (String value){
           nameString = value;
